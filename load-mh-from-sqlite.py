@@ -16,9 +16,9 @@ def main():
         db = sqlite3.connect(args.sqlite_db)
         c = db.cursor()
         c2 = db.cursor()
-        c.execute("SELECT id, name, scaled, ksize, filename FROM sketches")
-        for (id, name, scaled, ksize, filename) in c:
-            mh = sourmash.MinHash(n=0, ksize=ksize, scaled=scaled)
+        c.execute("SELECT id, name, num, scaled, ksize, filename, is_dna, is_protein, is_dayhoff, is_hp, track_abundance, seed FROM sketches")
+        for (id, name, num, scaled, ksize, filename, is_dna, is_protein, is_dayhoff, is_hp, track_abundance, seed) in c:
+            mh = sourmash.MinHash(n=num, ksize=ksize, scaled=scaled, seed=seed, is_protein=is_protein, dayhoff=is_dayhoff, hp=is_hp, track_abundance=track_abundance)
             c2.execute("SELECT hashval FROM hashes WHERE sketch_id=?", (id,))
 
             for hashval, in c2:
