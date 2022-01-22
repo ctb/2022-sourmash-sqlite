@@ -6,6 +6,13 @@ import argparse
 import sqlite3
 
 
+MAX_SQLITE_INT = 2 ** 63 - 1
+sqlite3.register_adapter(
+    int, lambda x: hex(x) if x > MAX_SQLITE_INT else x)
+sqlite3.register_converter(
+    'integer', lambda b: int(b, 16 if b[:2] == b'0x' else 10))
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('sqlite_db')
