@@ -20,7 +20,8 @@ def main():
     args = p.parse_args()
 
     with sourmash.sourmash_args.SaveSignaturesToLocation(args.output) as sigout:
-        db = sqlite3.connect(args.sqlite_db)
+        db = sqlite3.connect(args.sqlite_db,
+                             detect_types=sqlite3.PARSE_DECLTYPES)
         c = db.cursor()
         c2 = db.cursor()
         c.execute("SELECT id, name, num, scaled, ksize, filename, is_dna, is_protein, is_dayhoff, is_hp, track_abundance, seed FROM sketches")
