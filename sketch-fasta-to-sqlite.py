@@ -43,7 +43,7 @@ def main():
 
             ss = sourmash.SourmashSignature(mh, name=os.path.basename(seqfile),
                                             filename=seqfile)
-            db.insert(ss)
+            db.insert(ss, commit=False)
             n += 1
         else:
             siglist = []
@@ -53,10 +53,10 @@ def main():
                 ss = sourmash.SourmashSignature(mh,
                                                 name=record.name,
                                                 filename=seqfile)
-                db.insert(ss)
+                db.insert(ss, commit=False)
                 n += 1
 
-        db.conn.commit()
+        db.commit()
     print(f"Created {n} signatures and saved them to '{args.output}'")
 
 
