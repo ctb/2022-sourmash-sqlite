@@ -22,9 +22,14 @@ def main():
     p.add_argument('-k', '--ksize', type=int, default=10)
     p.add_argument('--scaled', type=int, default=200)
     p.add_argument('--combine-seqs', action='store_true', default=False)
+    p.add_argument('--keep-sqldb', action='store_true', default=False)
     args = p.parse_args()
 
     assert args.protein         # for now
+
+    if os.path.exists(args.output) and not args.keep_sqldb:
+        print(f"removing '{args.output}' because --keep-sqldb not specified")
+        os.unlink(args.output)
 
     template_mh = sourmash.MinHash(n=0, ksize=args.ksize,
                                    is_protein=args.protein,
@@ -33,6 +38,7 @@ def main():
     db = SqliteIndex(args.output)
 
     n = 0
+    cursor = db.cursor()
     for seqfile in args.seqfiles:
         print(f"Loading sequences from {seqfile}")
 
@@ -43,7 +49,7 @@ def main():
 
             ss = sourmash.SourmashSignature(mh, name=os.path.basename(seqfile),
                                             filename=seqfile)
-            db.insert(ss, commit=False)
+            db.insert(ss, commit=False, cursor=cursor)
             n += 1
         else:
             siglist = []
@@ -53,7 +59,7 @@ def main():
                 ss = sourmash.SourmashSignature(mh,
                                                 name=record.name,
                                                 filename=seqfile)
-                db.insert(ss, commit=False)
+                db.insert(ss, commit=False, cursor=cursor)
                 n += 1
 
         db.commit()
